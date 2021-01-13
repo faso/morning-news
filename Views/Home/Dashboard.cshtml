@@ -1,0 +1,85 @@
+﻿@model MorningNews2.Controllers.NewsViewModel
+
+@foreach (var subreddit in Model.Subreddits)
+{
+    <h1>@subreddit.Key</h1>
+    @foreach (var post in subreddit.Value)
+    {
+        var postUrl = Helpers.GetRedditPostLink(post);
+        var isImage = postUrl.EndsWith("png", StringComparison.CurrentCultureIgnoreCase)
+            || postUrl.EndsWith("jpg", StringComparison.CurrentCultureIgnoreCase)
+            || postUrl.EndsWith("jpeg", StringComparison.CurrentCultureIgnoreCase)
+            || postUrl.EndsWith("bmp", StringComparison.CurrentCultureIgnoreCase);
+
+        <span class="article">
+            <a href="https://www.reddit.com/r/@subreddit.Key/comments/@post.Id" class="lit">
+                [@Helpers.FormatNumber(post.Score)]
+            </a>
+            @if (isImage)
+            {
+                <a href="#" class="expand-icon">
+                    <svg class="expand-icon-bi" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707zm4.344-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707z" />
+                    </svg>
+                </a>
+            }
+            <a class="article-link" href="@postUrl" target="_blank">@post.Title</a>
+            @if (isImage)
+            {
+                <img class="reddit-image hidden" src="@postUrl" />
+            }
+            <br />
+        </span>
+    }
+}
+
+@if (Model.HackerNews.Any())
+{
+    <h1>hackernews</h1>
+    @foreach (var post in Model.HackerNews)
+    {
+        <span class="article">
+            <a href="https://news.ycombinator.com/item?id=@post.id" class="lit">
+                [@Helpers.FormatNumber(post.score)]
+            </a>
+            <a class="article-link" href="@post.url" target="_blank">@post.title</a>
+            <br />
+        </span>
+    }
+}
+
+@if (Model.Links.Any())
+{
+    <h1>external links</h1>
+    @foreach (var link in Model.Links)
+    {
+        <span class="article">
+            <a class="article-link" href="@link" target="_blank">@link</a>
+            <br />
+        </span>
+    }
+}
+
+<script>
+    const icons = document.getElementsByClassName("expand-icon");
+
+    for (const icon of icons) {
+        icon.addEventListener("click", function () {
+            var image = this.nextElementSibling.nextElementSibling;
+            image.classList.toggle("hidden");
+            image.classList.toggle("visible");
+        });
+    }
+
+    document.addEventListener("keyup", handleKey);
+    function handleKey(e) {
+        if (e.key === "a" || e.key === "A") {
+            const icons = document.getElementsByClassName("expand-icon");
+            for (const icon of icons) {
+                const image = icon.nextElementSibling.nextElementSibling;
+                image.classList.toggle("hidden");
+                image.classList.toggle("visible");
+            }
+        }
+    }
+</script>
